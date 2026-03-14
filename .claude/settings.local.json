@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install:*)",
+      "Read(//usr/local/bin/**)",
+      "Read(//opt/homebrew/**)",
+      "Read(//Users/marsidamaxhari/.nvm/versions/**)",
+      "Read(//Users/marsidamaxhari/.volta/bin/**)",
+      "Bash(source ~/.zshrc)",
+      "Bash(source ~/.zprofile)",
+      "Bash(echo $PATH)",
+      "Bash(command -v node)",
+      "Bash(~/.nvm/versions/node/v24.14.0/bin/npm install:*)",
+      "Bash(export PATH=\"$HOME/.nvm/versions/node/v24.14.0/bin:$PATH\")",
+      "Bash(npm --version)",
+      "Bash(node -e \"const fs = require\\(''fs''\\); console.log\\(fs.readdirSync\\(''node_modules''\\).join\\(''\\\\n''\\)\\)\")",
+      "Bash(node -e \"const pkg = require\\(''./node_modules/next/package.json''\\); console.log\\(''next version:'', pkg.version\\)\")",
+      "Bash(npm run:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
+    ]
+  }
+}
