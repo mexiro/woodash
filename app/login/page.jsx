@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect, Suspense } from 'react'
-import { signIn } from 'next-auth/react'
+import { signIn, useSession } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { Icons } from '../../lib/icons'
 
@@ -13,6 +13,14 @@ function LoginContent() {
   const [shake, setShake] = useState(false)
   const router = useRouter()
   const searchParams = useSearchParams()
+  const { status } = useSession()
+
+  // Already logged in — redirect immediately
+  useEffect(() => {
+    if (status === 'authenticated') {
+      router.replace('/dashboard')
+    }
+  }, [status, router])
 
   useEffect(() => {
     if (searchParams.get('error')) {
@@ -28,7 +36,7 @@ function LoginContent() {
       const result = await signIn('credentials', { email, password, redirect: false })
       setLoading(false)
       if (result?.ok) {
-        router.push('/dashboard')
+        router.replace('/dashboard')
       } else {
         setError('Invalid email or password')
         setShake(true)
@@ -43,6 +51,11 @@ function LoginContent() {
   }
 
   const handleKeyDown = e => { if (e.key === 'Enter') handleSubmit() }
+
+  // Don't render the form while we know the user is (or might be) authenticated
+  if (status === 'loading' || status === 'authenticated') {
+    return <div style={{ minHeight: '100vh', background: 'var(--sidebar-bg)' }} />
+  }
 
   return (
     <div style={{ fontFamily: 'var(--font)', minHeight: '100vh', background: 'var(--sidebar-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
