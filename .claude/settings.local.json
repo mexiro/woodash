@@ -19,7 +19,16 @@
       "Bash(git checkout:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git push:*)",
+      "Bash(find /Users/marsidamaxhari/Documents/Github/woodash/components -type f -name *.jsx -o -name *.js)",
+      "Bash(/usr/local/bin/npm install:*)",
+      "Bash(/opt/homebrew/bin/npm install:*)",
+      "Bash(npx --yes install-npm-deps swr)",
+      "Bash(ls /usr/local/bin/node*)",
+      "Bash(ls ~/.nvm/versions/node/*/bin/npm)",
+      "Bash(/Users/marsidamaxhari/.nvm/versions/node/v24.14.0/bin/npm install:*)",
+      "Bash(PATH=\"/Users/marsidamaxhari/.nvm/versions/node/v24.14.0/bin:$PATH\" npm install swr)",
+      "Bash(PATH=\"/Users/marsidamaxhari/.nvm/versions/node/v24.14.0/bin:$PATH\" npm run build)"
     ]
   }
 }

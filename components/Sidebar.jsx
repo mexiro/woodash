@@ -1,8 +1,8 @@
 'use client'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname } from 'next/navigation'
+import useSWR from 'swr'
 import { Icons } from '../lib/icons'
-import { MOCK_ORDERS } from '../lib/mock-data'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: Icons.dashboard },
@@ -13,7 +13,8 @@ const navItems = [
 
 export default function Sidebar({ user, onLogout }) {
   const pathname = usePathname()
-  const processingCount = MOCK_ORDERS.filter(o => o.status === 'processing').length
+  const { data: analytics } = useSWR('/api/analytics')
+  const processingCount = analytics?.orders_by_status?.processing || 0
 
   return (
     <aside style={{ width: 240, background: 'var(--sidebar-bg)', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>

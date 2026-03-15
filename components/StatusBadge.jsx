@@ -1,5 +1,5 @@
 'use client'
-import { STATUS_CONFIG } from '../lib/mock-data'
+import { STATUS_CONFIG } from '../lib/order-config'
 
 export default function StatusBadge({ status, small }) {
   const c = STATUS_CONFIG[status] || { label: status, color: '#6B7280', bg: '#F3F4F6' }

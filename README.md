@@ -1,137 +1,119 @@
 # WooCMS — WooCommerce Order Manager
 
-A lightweight CMS dashboard for managing WooCommerce orders, built with React + Vite.
+A CMS dashboard for managing WooCommerce orders, built with Next.js 14, NextAuth.js, and SWR. Supports a mock demo mode so you can run the full UI without a live store.
 
-## Features
-- Email/password login
-- Order tracking with status workflow
-- Invoice management
-- WooCommerce REST API connection
-- Responsive, clean UI
+**Stack:** Next.js 14 · React 18 · NextAuth.js v5 · SWR · Vercel
 
 ---
 
-## Quick Start (Local)
+## Run locally
 
 ```bash
-npm install
-npm run dev
-```
+# 1. Clone the repo
+git clone https://github.com/mexiro/wooComerce.git
+cd wooComerce
 
-Then open http://localhost:5173
+# 2. Copy the env template and fill in values
+cp .env.example .env.local
+
+# 3. Install dependencies
+npm install
+
+# 4. Start the dev server
+npm run dev
+
+# 5. Open http://localhost:3000
+```
 
 **Demo login:** `erion@example.com` / `admin123`
 
 ---
 
+## Environment variables
+
+Copy `.env.example` to `.env.local` and set each value:
+
+| Variable | Description |
+|---|---|
+| `MOCK_MODE` | `true` = use built-in sample data, `false` = connect to real WooCommerce |
+| `WOOCOMMERCE_URL` | Your WordPress store URL (e.g. `https://yourstore.com`) |
+| `WOOCOMMERCE_KEY` | WooCommerce REST API consumer key (`ck_...`) |
+| `WOOCOMMERCE_SECRET` | WooCommerce REST API consumer secret (`cs_...`) |
+| `AUTH_SECRET` | Random secret for signing session tokens — generate one at https://generate-secret.vercel.app |
+| `NEXTAUTH_URL` | Full URL of your app (e.g. `http://localhost:3000` or `https://your-app.vercel.app`) |
+| `AUTH_USER_1_EMAIL` | Email for user 1 |
+| `AUTH_USER_1_PASSWORD` | Password for user 1 |
+| `AUTH_USER_1_NAME` | Display name for user 1 |
+| `AUTH_USER_1_ROLE` | Role label for user 1 (e.g. `admin`) |
+| `AUTH_USER_2_EMAIL` | Email for user 2 (optional — add more with `AUTH_USER_3_*`, etc.) |
+| `AUTH_USER_2_PASSWORD` | Password for user 2 |
+| `AUTH_USER_2_NAME` | Display name for user 2 |
+| `AUTH_USER_2_ROLE` | Role label for user 2 (e.g. `editor`) |
+
+---
+
+## Switch to live WooCommerce
+
+1. In your WordPress admin: **WooCommerce → Settings → Advanced → REST API → Add Key**
+2. Set permissions to **Read/Write** and generate the key
+3. In `.env.local` (or Vercel environment variables):
+   ```
+   MOCK_MODE=false
+   WOOCOMMERCE_URL=https://yourstore.com
+   WOOCOMMERCE_KEY=ck_xxxxxxxxxxxxxxxx
+   WOOCOMMERCE_SECRET=cs_xxxxxxxxxxxxxxxx
+   ```
+4. Restart the dev server (or redeploy on Vercel)
+
+---
+
+## Add team members
+
+Add more `AUTH_USER_N_*` variables for each person. The app loops through all numbered users automatically:
+
+```
+AUTH_USER_3_EMAIL=colleague@example.com
+AUTH_USER_3_PASSWORD=securepassword
+AUTH_USER_3_NAME=Colleague
+AUTH_USER_3_ROLE=editor
+```
+
+---
+
 ## Deploy to Vercel
 
-### Prerequisites
-- A GitHub account (https://github.com)
-- A Vercel account (https://vercel.com — sign up with GitHub)
-- Git installed on your computer
+The GitHub repo is linked to Vercel — every `git push` to `main` triggers an automatic deploy.
 
-### Step-by-step
+After pushing for the first time, add these environment variables in your **Vercel dashboard → Project → Settings → Environment Variables**:
 
-**1. Unzip this project**
+- `AUTH_SECRET` (generate at https://generate-secret.vercel.app)
+- `NEXTAUTH_URL` = `https://your-app.vercel.app`
+- `MOCK_MODE` = `true`
+- All `AUTH_USER_*` variables for your team
 
-Unzip the `woo-cms.zip` file to a folder on your computer.
-
-**2. Open a terminal in that folder**
-
-On Mac: right-click the folder → "Open in Terminal"  
-On Windows: open the folder, type `cmd` in the address bar, press Enter
-
-**3. Initialize a Git repo**
-
-```bash
-git init
-git add .
-git commit -m "Initial commit"
-```
-
-**4. Create a GitHub repo**
-
-Go to https://github.com/new  
-- Name: `woo-cms`
-- Keep it Private
-- Do NOT add a README (you already have one)
-- Click "Create repository"
-
-**5. Push your code to GitHub**
-
-GitHub will show you commands. Copy and run the ones under "push an existing repository":
-
-```bash
-git remote add origin https://github.com/YOUR_USERNAME/woo-cms.git
-git branch -M main
-git push -u origin main
-```
-
-Replace `YOUR_USERNAME` with your actual GitHub username.
-
-**6. Connect to Vercel**
-
-- Go to https://vercel.com/dashboard
-- Click "Add New" → "Project"
-- Select your `woo-cms` repo from the list
-- Vercel auto-detects Vite — leave all settings as default
-- Click "Deploy"
-- Wait ~60 seconds
-
-**7. Done!**
-
-Vercel gives you a URL like `woo-cms-xxxx.vercel.app`. That's your live CMS.
+Then trigger a redeploy from the Deployments tab to pick up the new variables.
 
 ---
 
-## After Deployment
+## Project structure
 
-### Change login credentials
-
-Open `src/App.jsx` and edit the `AUTHORIZED_USERS` array at the top:
-
-```js
-const AUTHORIZED_USERS = [
-  { email: "your@email.com", password: "your-secure-password", name: "Your Name", role: "Admin" },
-  // add more users as needed
-];
 ```
-
-Then commit and push — Vercel redeploys automatically:
-
-```bash
-git add .
-git commit -m "Update credentials"
-git push
-```
-
-### Connect your WooCommerce store
-
-1. In your WordPress admin: WooCommerce → Settings → Advanced → REST API
-2. Click "Add Key"
-3. Description: `WooCMS`
-4. User: select your admin user
-5. Permissions: `Read/Write`
-6. Click "Generate API Key"
-7. Copy the Consumer Key and Consumer Secret
-8. In WooCMS, go to Connection page and paste them in
-
-### Custom domain (optional)
-
-In Vercel dashboard → your project → Settings → Domains → add `cms.yourstore.com`
-
-Then in your domain DNS, add a CNAME record pointing to `cname.vercel-dns.com`
-
----
-
-## Updating the app
-
-Any time you push changes to GitHub, Vercel auto-deploys within ~30 seconds:
-
-```bash
-# make changes to src/App.jsx
-git add .
-git commit -m "Description of changes"
-git push
+app/
+  api/          # Next.js API routes (orders, products, customers, analytics, auth)
+  dashboard/    # Dashboard with analytics
+  orders/       # Order list + order detail
+  products/     # Product catalog
+  customers/    # Customer list
+  invoices/     # Invoices
+  settings/     # WooCommerce connection settings
+  login/        # Login page
+components/     # Shared UI (Sidebar, StatusBadge, OrderDetailPanel, AppShell)
+lib/
+  api.js          # Frontend fetch helpers
+  auth.js         # NextAuth config
+  fetcher.js      # SWR fetcher
+  mock-data.js    # Sample data (used by API routes in mock mode)
+  order-config.js # Status labels and workflow config
+  woo-client.js   # WooCommerce REST API client
+middleware.js   # Route protection (redirects unauthenticated users to /login)
 ```
