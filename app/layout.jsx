@@ -1,4 +1,5 @@
 import './globals.css'
+import SessionProvider from '../components/SessionProvider'
 import AppShell from '../components/AppShell'
 
 export const metadata = {
@@ -10,7 +11,9 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body>
-        <AppShell>{children}</AppShell>
+        <SessionProvider>
+          <AppShell>{children}</AppShell>
+        </SessionProvider>
       </body>
     </html>
   )

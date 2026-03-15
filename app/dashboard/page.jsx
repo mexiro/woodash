@@ -1,6 +1,6 @@
 'use client'
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
+import { useSession } from 'next-auth/react'
 import { MOCK_ORDERS } from '../../lib/mock-data'
 import { Icons } from '../../lib/icons'
 import StatusBadge from '../../components/StatusBadge'
@@ -19,12 +19,8 @@ function StatCard({ icon, label, value, sub }) {
 }
 
 export default function DashboardPage() {
-  const [userName, setUserName] = useState('there')
-
-  useEffect(() => {
-    const stored = localStorage.getItem('woo_user')
-    if (stored) setUserName(JSON.parse(stored).name)
-  }, [])
+  const { data: session } = useSession()
+  const userName = session?.user?.name || 'there'
 
   const stats = {
     total: MOCK_ORDERS.length,

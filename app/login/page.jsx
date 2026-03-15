@@ -1,10 +1,10 @@
 'use client'
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import { AUTHORIZED_USERS } from '../../lib/mock-data'
+import { useState, useEffect, Suspense } from 'react'
+import { signIn } from 'next-auth/react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { Icons } from '../../lib/icons'
 
-export default function LoginPage() {
+function LoginContent() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPw, setShowPw] = useState(false)
@@ -12,23 +12,34 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [shake, setShake] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
 
-  const handleSubmit = () => {
+  useEffect(() => {
+    if (searchParams.get('error')) {
+      setError('Invalid email or password')
+    }
+  }, [])
+
+  const handleSubmit = async () => {
     setError('')
     if (!email || !password) { setError('Please fill in all fields'); return }
     setLoading(true)
-    setTimeout(() => {
-      const user = AUTHORIZED_USERS.find(u => u.email === email && u.password === password)
-      if (user) {
-        localStorage.setItem('woo_user', JSON.stringify(user))
+    try {
+      const result = await signIn('credentials', { email, password, redirect: false })
+      setLoading(false)
+      if (result?.ok) {
         router.push('/dashboard')
       } else {
         setError('Invalid email or password')
         setShake(true)
         setTimeout(() => setShake(false), 500)
       }
+    } catch {
       setLoading(false)
-    }, 800)
+      setError('Invalid email or password')
+      setShake(true)
+      setTimeout(() => setShake(false), 500)
+    }
   }
 
   const handleKeyDown = e => { if (e.key === 'Enter') handleSubmit() }
@@ -59,14 +70,8 @@ export default function LoginPage() {
             <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 7 }}>Email</label>
             <div style={{ position: 'relative' }}>
               <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }}>{Icons.mail}</span>
-              <input
-                className="login-input"
-                type="email" value={email}
-                onChange={e => setEmail(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="you@company.com"
-                style={{ width: '100%', padding: '12px 14px 12px 44px', border: '1.5px solid var(--border)', borderRadius: 10, fontSize: 15, fontFamily: 'var(--font)', background: 'var(--bg)', color: 'var(--text)', outline: 'none', transition: 'all 0.2s', boxSizing: 'border-box' }}
-              />
+              <input className="login-input" type="email" value={email} onChange={e => setEmail(e.target.value)} onKeyDown={handleKeyDown} placeholder="you@company.com"
+                style={{ width: '100%', padding: '12px 14px 12px 44px', border: '1.5px solid var(--border)', borderRadius: 10, fontSize: 15, fontFamily: 'var(--font)', background: 'var(--bg)', color: 'var(--text)', outline: 'none', transition: 'all 0.2s', boxSizing: 'border-box' }} />
             </div>
           </div>
 
@@ -74,26 +79,15 @@ export default function LoginPage() {
             <label style={{ display: 'block', fontSize: 13, fontWeight: 600, color: 'var(--text)', marginBottom: 7 }}>Password</label>
             <div style={{ position: 'relative' }}>
               <span style={{ position: 'absolute', left: 14, top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }}>{Icons.lock}</span>
-              <input
-                className="login-input"
-                type={showPw ? 'text' : 'password'} value={password}
-                onChange={e => setPassword(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="Enter your password"
-                style={{ width: '100%', padding: '12px 48px 12px 44px', border: '1.5px solid var(--border)', borderRadius: 10, fontSize: 15, fontFamily: 'var(--font)', background: 'var(--bg)', color: 'var(--text)', outline: 'none', transition: 'all 0.2s', boxSizing: 'border-box' }}
-              />
-              <button
-                onClick={() => setShowPw(!showPw)}
-                style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 4 }}
-              >
+              <input className="login-input" type={showPw ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)} onKeyDown={handleKeyDown} placeholder="Enter your password"
+                style={{ width: '100%', padding: '12px 48px 12px 44px', border: '1.5px solid var(--border)', borderRadius: 10, fontSize: 15, fontFamily: 'var(--font)', background: 'var(--bg)', color: 'var(--text)', outline: 'none', transition: 'all 0.2s', boxSizing: 'border-box' }} />
+              <button onClick={() => setShowPw(!showPw)} style={{ position: 'absolute', right: 12, top: '50%', transform: 'translateY(-50%)', background: 'none', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', padding: 4 }}>
                 {showPw ? Icons.eyeOff : Icons.eye}
               </button>
             </div>
           </div>
 
-          <button
-            onClick={handleSubmit}
-            disabled={loading}
+          <button onClick={handleSubmit} disabled={loading}
             style={{ width: '100%', padding: '13px 20px', background: 'var(--accent)', color: '#fff', border: 'none', borderRadius: 10, fontSize: 15, fontWeight: 600, cursor: loading ? 'wait' : 'pointer', fontFamily: 'var(--font)', transition: 'all 0.2s', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, boxShadow: '0 4px 12px rgba(45,90,39,0.25)' }}
             onMouseEnter={e => { if (!loading) e.currentTarget.style.background = 'var(--accent-hover)' }}
             onMouseLeave={e => { if (!loading) e.currentTarget.style.background = 'var(--accent)' }}
@@ -111,5 +105,13 @@ export default function LoginPage() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense>
+      <LoginContent />
+    </Suspense>
   )
 }

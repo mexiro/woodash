@@ -1,12 +1,12 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { MOCK_ORDERS, STATUS_CONFIG } from '../../lib/mock-data'
 import { Icons } from '../../lib/icons'
 import StatusBadge from '../../components/StatusBadge'
 import OrderDetailPanel from '../../components/OrderDetailPanel'
 
-export default function OrdersPage() {
+function OrdersContent() {
   const searchParams = useSearchParams()
   const [orders, setOrders] = useState(MOCK_ORDERS)
   const [search, setSearch] = useState('')
@@ -129,5 +129,13 @@ export default function OrdersPage() {
         </div>
       )}
     </div>
+  )
+}
+
+export default function OrdersPage() {
+  return (
+    <Suspense fallback={<div style={{ padding: 40, color: 'var(--text-muted)' }}>Loading orders...</div>}>
+      <OrdersContent />
+    </Suspense>
   )
 }
